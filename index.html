@@ -1,304 +1,875 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Diseño de Arquitectura de Software - HVU</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        line-height: 1.6;
-        margin: 40px;
-        background: #f8f8f8;
-    }
-    h1, h2, h3, h4 {
-        color: #333;
-    }
-    pre {
-        background: #eee;
-        padding: 10px;
-        border-left: 4px solid #666;
-        overflow-x: auto;
-    }
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 20px 0;
-        background: white;
-    }
-    table, th, td {
-        border: 1px solid #bbb;
-    }
-    th, td {
-        padding: 8px;
-        text-align: left;
-    }
-    img {
-        width: 85%;
-        margin: 20px auto;
-        display: block;
-        border: 1px solid #ccc;
-    }
-    .center {
-        text-align: center;
-    }
-</style>
+    <meta charset="UTF-8">
+    <title>Diseño de Arquitectura de Software - App Gestión Dormitorios HVU-ULV</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="DUMAG Desarrolladora">
+    <meta name="description" content="Diseño de Arquitectura de Software - App Gestión Dormitorios HVU-ULV">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 2rem 10%;
+            background-color: #f9f9f9;
+            color: #222;
+        }
+        h1, h2, h3, h4 {
+            color: #222;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 0.2rem;
+        }
+        .subtitle {
+            text-align: center;
+            font-size: 1.1rem;
+        }
+        .authors, .date {
+            text-align: center;
+            margin: 0.1rem 0;
+        }
+        hr {
+            margin: 2rem 0;
+        }
+        .abstract {
+            background: #ffffff;
+            border-left: 4px solid #444;
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+        figure {
+            text-align: center;
+            margin: 1.5rem auto;
+        }
+        figure img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ccc;
+            background: #fff;
+        }
+        figure figcaption {
+            font-size: 0.95rem;
+            color: #444;
+            margin-top: 0.5rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: #fff;
+        }
+        table thead tr {
+            background: #eaeaea;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 0.5rem;
+            vertical-align: top;
+        }
+        th {
+            font-weight: bold;
+            text-align: left;
+        }
+        code {
+            font-family: "Courier New", monospace;
+            background: #f1f1f1;
+            padding: 0.1rem 0.25rem;
+            border-radius: 3px;
+        }
+        ul, ol {
+            margin-left: 1.5rem;
+        }
+        .small-note {
+            font-size: 0.9rem;
+            color: #555;
+        }
+        .section-title {
+            margin-top: 2.5rem;
+        }
+    </style>
 </head>
-
 <body>
 
-<h1 class="center">Diseño de Arquitectura de Software</h1>
-<h3 class="center">Aplicación HVU – Gestión de Dormitorios</h3>
-<p class="center"><strong>Autores:</strong> Erik Magdiel Pérez García, Duilio Emiliano Ortega</p>
-<p class="center">30 de octubre de 2025</p>
-
-<hr>
-
-<h2>Índice</h2>
-<ol>
-    <li>Introducción</li>
-    <li>Representación Arquitectónica</li>
-    <li>Objetivos y Restricciones Arquitectónicas</li>
-    <li>Vista del Caso de Uso</li>
-    <li>Visión Lógica (Componentes + Backend + BD + API)</li>
-    <li>Vista del Proceso</li>
-    <li>Vista de Implementación</li>
-    <li>Tamaño y Rendimiento</li>
-    <li>Calidad</li>
-</ol>
-
-<hr>
-
-<h2>1. Introducción</h2>
-
-<h3>1.1 Propósito</h3>
-<p>El propósito de este documento es describir la arquitectura de software de la Aplicación de Gestión de Dormitorios del Hogar de Varones Universitarios (HVU). Este documento complementa la Especificación de Requisitos (SRS) y presenta las decisiones arquitectónicas, los componentes principales y la estructura interna del sistema.</p>
-
-<h3>1.2 Alcance</h3>
-<p>La arquitectura cubre tres capas principales: Flutter (cliente), Node.js/Express (backend) y SQL Server (base de datos). El sistema soporta funcionalidades como control de limpieza, asistencias, reportes disciplinarios, amonestaciones y estadísticas.</p>
-
-<h3>1.3 Definiciones</h3>
-<ul>
-    <li><b>Monitor (Rol 2):</b> Estudiante con permisos especiales.</li>
-    <li><b>Preceptor (Rol 1):</b> Administrador del dormitorio.</li>
-    <li><b>API REST:</b> Protocolo de comunicación entre cliente y servidor.</li>
-</ul>
-
-<h3>1.4 Referencias</h3>
-<ul>
-    <li>Especificación SRS del Proyecto HVU</li>
-    <li>Documentación oficial Flutter y Node.js</li>
-</ul>
-
-<hr>
-
-<h2>2. Representación Arquitectónica</h2>
-
-<p>El sistema utiliza una arquitectura cliente-servidor de tres capas:</p>
-
-<ul>
-    <li><b>Cliente (Flutter):</b> interfaz y experiencia del usuario.</li>
-    <li><b>Servidor (Node.js/Express):</b> lógica de negocio y reglas.</li>
-    <li><b>Base de Datos (SQL Server):</b> persistencia de información.</li>
-</ul>
-
-<h3>Diagrama General</h3>
-
-<p><i>Aquí debes subir tu imagen "111.png" al repositorio y usar esta ruta:</i></p>
-
-<img src="img/111.png" alt="Diagrama de Arquitectura">
-
-<hr>
-
-<h2>3. Objetivos y Restricciones Arquitectónicas</h2>
-
-<h3>3.1 Objetivos</h3>
-<ul>
-    <li>Automatizar procesos del dormitorio universitario.</li>
-    <li>Garantizar seguridad, escalabilidad y disponibilidad.</li>
-    <li>Soportar roles y permisos basados en usuarios.</li>
-</ul>
-
-<h3>3.2 Restricciones</h3>
-<ul>
-    <li>La app debe funcionar en Android e iOS.</li>
-    <li>La base de datos debe ser SQL Server.</li>
-    <li>Los estudiantes sólo pueden ver su propia información.</li>
-    <li>La comunicación debe ser mediante HTTPS.</li>
-</ul>
-
-<hr>
-
-<h2>4. Vista del Caso de Uso</h2>
-
-<h3>4.1 Actores</h3>
-<ul>
-    <li><b>Estudiante:</b> consulta limpieza, reportes, asistencia.</li>
-    <li><b>Monitor:</b> evalúa limpieza, genera QR, revisa asistentes.</li>
-    <li><b>Preceptor:</b> administra roles, reportes, amonestaciones.</li>
-</ul>
-
-<h3>4.2 Casos de Uso Clave</h3>
-<ul>
-    <li>Registrar asistencia con QR</li>
-    <li>Registrar limpieza</li>
-    <li>Consultar reportes</li>
-    <li>Asignar/quitar monitor</li>
-</ul>
-
-<hr>
-
-<h2>5. Visión Lógica (Componentes)</h2>
-
-<h3>5.1 Componente Cliente (Flutter)</h3>
-<ul>
-    <li>Pantallas UI/UX</li>
-    <li>Gestor de Estado (Provider)</li>
-    <li>Servicio HTTP</li>
-</ul>
-
-<h3>5.2 Componente Backend (Node.js)</h3>
-
-<p>Organizado en capas:</p>
-
-<table>
-<thead>
-<tr><th>Capa</th><th>Descripción</th></tr>
-</thead>
-<tbody>
-<tr><td>Ruteo</td><td>Define endpoints principales.</td></tr>
-<tr><td>Controladores</td><td>Validan y procesan peticiones.</td></tr>
-<tr><td>Servicios</td><td>Implementan reglas de negocio.</td></tr>
-<tr><td>DAL</td><td>Acceso seguro a SQL Server.</td></tr>
-</tbody>
-</table>
-
-<h3>5.3 Endpoints Principales</h3>
-
-<p>Ya incluí todo tu listado de endpoints completo:</p>
-
-<pre>
-/api/auth/login
-/api/reportes/crear
-/api/limpieza/registrar
-/api/asistencia/registrar
-/api/usuarios/monitores
-</pre>
-
-<h3>5.4 Base de Datos</h3>
-<ul>
-    <li>Usuarios</li>
-    <li>Estudiantes</li>
-    <li>Reportes</li>
-    <li>Amonestaciones</li>
-    <li>Limpieza + LimpiezaDetalle</li>
-    <li>Asistencias</li>
-</ul>
-
-<hr>
-
-<h2>6. Vista del Proceso</h2>
-
-<p>Procesos distribuidos entre Flutter, Node y SQL.</p>
-<ul>
-    <li>Cliente: navegación, lectura de roles, llamadas HTTP.</li>
-    <li>Backend: validación, controladores, transacciones.</li>
-    <li>BD: consultas, inserciones, JOINS, triggers futuros.</li>
-</ul>
-
-<hr>
-
-<h2>7. Vista de Implementación</h2>
-
-<ul>
-    <li><b>Móvil (Flutter):</b> APK/IPA instalado en dispositivos.</li>
-    <li><b>Servidor:</b> API Node.js con Express.</li>
-    <li><b>SQL Server:</b> hospedado institucionalmente.</li>
-</ul>
-
-<hr>
-
-<h2>8. Tamaño y Rendimiento</h2>
-<ul>
-    <li>95% de transacciones en menos de 10 segundos.</li>
-    <li>Soporta múltiples usuarios concurrentes.</li>
-    <li>Procesamiento entre 5-10 transacciones/s.</li>
-</ul>
-
-<hr>
-
-<h2>9. Calidad</h2>
-
-<h3>Seguridad</h3>
-<ul>
-    <li>HTTPS</li>
-    <li>Autenticación por credenciales únicas</li>
-    <li>Autorización por roles</li>
-</ul>
-
-<h3>Disponibilidad</h3>
-<p>99% de uptime proyectado</p>
-
-<h3>Mantenibilidad</h3>
-<p>Arquitectura por capas y modularidad.</p>
-
-<hr>
-
-<h2>10. Diagramas de Secuencia</h2>
-
-<p>Aquí irán cada una de tus imágenes de secuencia. Usa los nombres sugeridos:</p>
-
-<h3>10.1 Inicio de sesión exitoso</h3>
-<img src="img/1.jpeg" alt="Secuencia 1">
-
-<h3>10.2 Inicio de sesión fallido</h3>
-<img src="img/2.jpeg" alt="Secuencia 2">
-
-<h3>10.3 Ver calificación de limpieza</h3>
-<img src="img/3.jpeg" alt="Secuencia 3">
-
-<h3>10.4 Ver reportes</h3>
-<img src="img/4.jpeg" alt="Secuencia 4">
-
-<h3>10.5 Registrar asistencia QR</h3>
-<img src="img/5.jpeg" alt="Secuencia 5">
-
-<h3>10.6 Generar QR Monitor</h3>
-<img src="img/6.jpeg" alt="Secuencia 6">
-
-<h3>10.7 Ver asistencias</h3>
-<img src="img/7.jpeg" alt="Secuencia 7">
-
-<h3>10.8 Ver cuartos</h3>
-<img src="img/8.jpeg" alt="Secuencia 8">
-
-<h3>10.9 Registrar limpieza</h3>
-<img src="img/9.jpeg" alt="Secuencia 9">
-
-<h3>10.10 Buscar reportes</h3>
-<img src="img/10.jpeg" alt="Secuencia 10">
-
-<h3>10.11 Crear reporte</h3>
-<img src="img/11.jpeg" alt="Secuencia 11">
-
-<h3>10.12 Ver monitores</h3>
-<img src="img/12.jpeg" alt="Secuencia 12">
-
-<h3>10.13 Asignar monitor</h3>
-<img src="img/13.jpeg" alt="Secuencia 13">
-
-<h3>10.14 Quitar monitor</h3>
-<img src="img/14.jpeg" alt="Secuencia 14">
-
-<h3>10.15 Ver reportes paginados</h3>
-<img src="img/15.jpeg" alt="Secuencia 15">
-
-<h3>10.16 Crear amonestación</h3>
-<img src="img/16.jpeg" alt="Secuencia 16">
-
-<h3>10.17 Vista general de limpieza</h3>
-<img src="img/17.jpeg" alt="Secuencia 17">
+    <!-- Portada -->
+    <h1>Diseño de Arquitectura de Software</h1>
+    <p class="subtitle">App Gestión Dormitorios HVU-ULV</p>
+    <p class="authors"><strong>Erik Magdiel Pérez García, Duilio Emiliano Ortega</strong></p>
+    <p class="date">30 de octubre de 2025</p>
+
+    <hr>
+
+    <!-- (Equivalente a abstract) -->
+    <div class="abstract">
+        <h2>Resumen</h2>
+        <p>
+            Este documento describe la estructura técnica para la “Aplicación de Gestión de Dormitorio Estudiantil", 
+            identificando sus componentes principales, cómo interactúan entre sí y los patrones de diseño que guiarán su construcción.
+        </p>
+    </div>
+
+    <!-- 1. Diagrama de Arquitectura -->
+    <h2 class="section-title">1. Diagrama de Arquitectura</h2>
+
+    <p>
+        El sistema se basará en una <strong>arquitectura cliente-servidor de tres capas distribuida</strong>. 
+        Esta arquitectura desacopla la presentación, la lógica de negocio y el almacenamiento de datos, 
+        lo que resulta en un sistema más modular, escalable y fácil de mantener.
+    </p>
+
+    <!-- Imagen 111.png -->
+    <figure>
+        <img src="111.png" alt="Diagrama general de la arquitectura del sistema">
+        <figcaption>Figura 1. Diagrama general de la arquitectura del sistema.</figcaption>
+    </figure>
+
+    <p><strong>Capa de Cliente (Presentación):</strong> Es la aplicación móvil desarrollada en <strong>Flutter</strong>. 
+        Se encarga exclusivamente de la interfaz de usuario (UI) y la experiencia de usuario (UX). 
+        Se comunica con el backend a través de una API REST.
+    </p>
+
+    <p><strong>Capa de Servidor (Lógica de Negocio):</strong> Es el backend desarrollado en <strong>Node.js</strong>. 
+        Contiene toda la lógica de negocio, procesa las solicitudes del cliente, valida datos, 
+        se comunica con la base de datos y expone los datos a través de una API RESTful segura.
+    </p>
+
+    <p><strong>Capa de Datos (Persistencia):</strong> Es la <strong>base de datos (SQL)</strong>. 
+        Su única responsabilidad es almacenar y recuperar datos de manera eficiente y segura. 
+        No contiene ninguna lógica de negocio.
+    </p>
+
+    <!-- 2. Descripción de Componentes y sus Interfaces -->
+    <h2 class="section-title">2. Descripción de Componentes y sus Interfaces</h2>
+
+    <h3>2.1 Componente: Aplicación Móvil (Cliente - Flutter)</h3>
+
+    <p><strong>Descripción:</strong> Es el punto de entrada para todos los usuarios (estudiantes y administradores). 
+        Es una aplicación multi-plataforma que se enfoca en presentar los datos de manera intuitiva.
+    </p>
+
+    <p><strong>Sub-módulos:</strong></p>
+    <ul>
+        <li><strong>Módulo de Vistas (UI):</strong> Pantallas para login, dashboard, anuncios, formulario de permisos, lista de asistencia, etc.</li>
+        <li><strong>Gestor de Estado (State Management):</strong> Controla el estado de la aplicación para mantener la UI consistente 
+            (ej. usando Provider o BLoC).</li>
+        <li><strong>Cliente HTTP:</strong> Módulo responsable de realizar las llamadas a la API del backend y manejar las respuestas.</li>
+    </ul>
+
+    <p>
+        La aplicación es responsable de comunicar exclusivamente con el backend a través de su 
+        <strong>API RESTful</strong>. 
+        Consume los endpoints expuestos por el servidor para enviar y recibir datos en formato JSON.
+    </p>
+
+    <h3>2.2 Componente: Servidor Backend (Node.js)</h3>
+
+    <p><strong>Descripción:</strong> Maneja la autenticación, autorizaciones, reglas de negocio y la orquestación de datos.</p>
+
+    <!-- Tabla de resultados descriptivos (Tabla 3) -->
+    <table>
+        <thead>
+            <tr>
+                <th>Pregunta</th>
+                <th>1</th>
+                <th>2</th>
+                <th>3</th>
+                <th>4</th>
+                <th>5</th>
+            </tr>
+            <tr>
+                <th></th>
+                <th colspan="5">Nivel de Acuerdo (%)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>P1. Considero necesario mejorar el mecanismo del registro de orden, limpieza y disciplina de habitaciones dentro de las residencias universitarias.</td>
+                <td>0.9</td>
+                <td>5.2</td>
+                <td>13.0</td>
+                <td>13.9</td>
+                <td>67.0</td>
+            </tr>
+            <tr>
+                <td>P2. El mecanismo actual de control de asistencias a las actividades (matutina, vespertina, cultos, etc.) es efectivo.</td>
+                <td>2.6</td>
+                <td>6.1</td>
+                <td>8.7</td>
+                <td>13.9</td>
+                <td>68.7</td>
+            </tr>
+            <tr>
+                <td>P3. Actualmente, recibo información oportuna sobre reportes y/o amonestaciones.</td>
+                <td>0.9</td>
+                <td>7.8</td>
+                <td>15.7</td>
+                <td>9.5</td>
+                <td>66.1</td>
+            </tr>
+            <tr>
+                <td>P4. Una aplicación ayudaría a que los estudiantes conozcan mejor sus tareas asignadas y responsabilidades en la residencia.</td>
+                <td>1.7</td>
+                <td>3.5</td>
+                <td>7.8</td>
+                <td>18.3</td>
+                <td>68.7</td>
+            </tr>
+            <tr>
+                <td>P5. Estoy dispuesto a usar una aplicación para consultar información sobre limpieza, asistencia o reportes en mi dormitorio.</td>
+                <td>4.3</td>
+                <td>3.5</td>
+                <td>6.2</td>
+                <td>13.0</td>
+                <td>73.0</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p class="small-note"><strong>Tabla 3.</strong> Resultados descriptivos de la encuesta aplicada a los estudiantes del HVU sobre la factibilidad de una aplicación móvil.</p>
+
+    <h3>2.3 Sub-módulos (Capas)</h3>
+
+    <p>El servidor se organiza en capas que separan responsabilidades y favorecen la escalabilidad del sistema.</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Capa</th>
+                <th>Descripción</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Capa de Ruteo</strong></td>
+                <td>Define los endpoints principales de la API (ej. <code>/api/auth</code>, <code>/api/detallecuarto</code>, <code>/api/monitores</code>).</td>
+            </tr>
+            <tr>
+                <td><strong>Capa de Controladores</strong></td>
+                <td>Recibe las peticiones, las valida y llama a los servicios correspondientes.</td>
+            </tr>
+            <tr>
+                <td><strong>Capa de Servicios</strong></td>
+                <td>Implementa la lógica de negocio principal (ej. la lógica para aprobar un permiso).</td>
+            </tr>
+            <tr>
+                <td><strong>Capa de Acceso a Datos (DAL)</strong></td>
+                <td>Abstrae la comunicación con la base de datos, garantizando seguridad y consistencia.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p><strong>API RESTFUL:</strong> Expone una interfaz a través de HTTP para ser consumida por el cliente.  
+        Su responsabilidad es manejar las acciones (<code>GET</code>, <code>POST</code>, <code>PUT</code>, <code>DELETE</code>) sobre los recursos del sistema.
+    </p>
+
+    <h3>2.4 Endpoints Principales de la API</h3>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Módulo / Ruta Base</th>
+                <th>Método / Endpoint</th>
+                <th>Descripción</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Autenticación -->
+            <tr>
+                <td><strong>Autenticación (<code>/api/auth</code>)</strong></td>
+                <td><code>POST /login</code></td>
+                <td>
+                    Autentica a un usuario (Estudiante, Monitor o Preceptor) usando <code>UsuarioID</code> y <code>Password</code>.<br>
+                    Devuelve los datos del usuario, incluyendo su <code>IdRol</code>.
+                </td>
+            </tr>
+
+            <!-- Usuarios -->
+            <tr>
+                <td rowspan="2"><strong>Gestión de Usuarios/Roles (<code>/api/usuarios</code>)</strong></td>
+                <td><code>GET /monitores</code></td>
+                <td>Obtiene la lista de usuarios con el rol de Monitor (<code>IdRol = 2</code>), incluyendo su <code>UsuarioID</code> y <code>NombreCompleto</code>. (Usado por Preceptor).</td>
+            </tr>
+            <tr>
+                <td><code>PUT /:usuarioID/rol</code></td>
+                <td>
+                    Actualiza el <code>IdRol</code> de un usuario específico. 
+                    Se usa para asignar (<code>nuevoRol: 2</code>) o quitar (<code>nuevoRol: 3</code>) el rol de Monitor. (Usado por Preceptor).
+                </td>
+            </tr>
+
+            <!-- Limpieza -->
+            <tr>
+                <td rowspan="4"><strong>Limpieza (<code>/api/limpieza</code>)</strong></td>
+                <td><code>GET /detalle/:idCuarto</code></td>
+                <td>Obtiene los detalles completos de la <em>última</em> evaluación de limpieza para un cuarto específico. (Usado por Estudiante).</td>
+            </tr>
+            <tr>
+                <td><code>GET /criterios</code></td>
+                <td>Obtiene la lista de todos los criterios de limpieza disponibles (<code>IdCriterio</code>, <code>Descripción</code>). (Usado por Monitor al registrar).</td>
+            </tr>
+            <tr>
+                <td><code>POST /registrar</code></td>
+                <td>Guarda una <em>nueva</em> evaluación de limpieza para un cuarto, incluyendo calificaciones y observaciones. (Usado por Monitor).</td>
+            </tr>
+            <tr>
+                <td><code>GET /cuartos con calificacion</code></td>
+                <td>
+                    Obtiene la lista de <em>todos</em> los cuartos, incluyendo su <code>NúmeroCuarto</code>, 
+                    <code>IdPasillo</code> y la <code>ÚltimaCalificación</code>. (Usado por Monitor y Preceptor).
+                </td>
+            </tr>
+
+            <!-- Reportes -->
+            <tr>
+                <td rowspan="3"><strong>Reportes (<code>/api/reportes</code>)</strong></td>
+                <td><code>GET /estudiante/:matricula</code></td>
+                <td>Obtiene la lista de reportes de una matrícula específica. (Usado por Estudiante, Monitor o Preceptor).</td>
+            </tr>
+            <tr>
+                <td><code>POST /crear</code></td>
+                <td>Crea un <em>nuevo</em> reporte para un estudiante. Guarda el estado como 'Aprobado' automáticamente. (Usado por Monitor y Preceptor).</td>
+            </tr>
+            <tr>
+                <td><code>GET /</code></td>
+                <td>Obtiene <em>todos</em> los reportes del sistema con paginación (<code>?page=X&amp;limit=Y</code>) y búsqueda (<code>?search=Z</code>). (Usado por Preceptor).</td>
+            </tr>
+
+            <!-- Amonestaciones -->
+            <tr>
+                <td rowspan="4"><strong>Amonestaciones (<code>/api/amonestaciones</code>)</strong></td>
+                <td><code>POST /registrar</code></td>
+                <td>Registra una <em>nueva</em> amonestación formal para un estudiante. (Usado por Preceptor).</td>
+            </tr>
+            <tr>
+                <td><code>GET /</code></td>
+                <td>Obtiene <em>todas</em> las amonestaciones registradas en el sistema. (Usado por Preceptor).</td>
+            </tr>
+            <tr>
+                <td><code>GET /estudiante/:matricula</code></td>
+                <td>Obtiene la lista de amonestaciones para un estudiante específico. (Usado por Estudiante).</td>
+            </tr>
+            <tr>
+                <td><code>GET /niveles</code></td>
+                <td>Obtiene la lista de niveles de amonestación disponibles (<code>IdNivel</code>, <code>Nombre</code>). (Usado por Preceptor al registrar).</td>
+            </tr>
+
+            <!-- Asistencia -->
+            <tr>
+                <td rowspan="3"><strong>Asistencia (<code>/api/asistencia</code>)</strong></td>
+                <td><code>POST /registrar</code></td>
+                <td>Registra la asistencia de un estudiante a un culto o actividad específica. (Usado por la app del Estudiante al escanear QR).</td>
+            </tr>
+            <tr>
+                <td><code>GET /estudiante/:matricula</code></td>
+                <td>Obtiene el historial de asistencias de un estudiante. (Usado por Estudiante).</td>
+            </tr>
+            <tr>
+                <td><code>GET /culto</code></td>
+                <td>Obtiene la lista de estudiantes que asistieron a un <code>idTipoCulto</code> en una fecha determinada. (Usado por Monitor).</td>
+            </tr>
+
+            <!-- Cultos -->
+            <tr>
+                <td><strong>Cultos/Actividades (<code>/api/cultos</code>)</strong></td>
+                <td><code>GET /tipos</code></td>
+                <td>Obtiene la lista de todos los tipos de culto o actividad disponibles (<code>IdTipoCulto</code>, <code>Nombre</code>). (Usado por Monitor en “Generar QR” y “Ver Asistencias”).</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p class="small-note"><strong>Tabla.</strong> Principales módulos y endpoints de la API RESTful.</p>
+
+    <!-- 2.5 Componente: Base de Datos -->
+    <h3>2.5 Componente: Base de Datos</h3>
+
+    <p><strong>Descripción:</strong> Es el sistema de almacenamiento persistente de la aplicación, implementado en SQL Server. 
+        Su responsabilidad es guardar, organizar y recuperar toda la información de manera eficiente, segura y consistente. 
+        Alberga las entidades principales del dominio, tales como:
+    </p>
+
+    <ul>
+        <li><strong>Catálogos:</strong> Tablas auxiliares para definir Tipos de Culto, Niveles de Amonestación, Criterios de Limpieza, Roles, etc.</li>
+        <li><strong>Usuarios:</strong> Información de autenticación y roles (Estudiante, Monitor, Preceptor).</li>
+        <li><strong>Perfiles:</strong> Datos específicos de Estudiantes (incluyendo carrera, cuarto, pasillo si es monitor) y Preceptores.</li>
+        <li><strong>Estructura:</strong> Información sobre Cuartos y Pasillos.</li>
+        <li><strong>Registros de Actividad:</strong> Datos sobre Limpieza (evaluaciones y detalles), Reportes disciplinarios, Amonestaciones y Asistencia a Cultos/Actividades.</li>
+    </ul>
+
+    <p>
+        La base de datos no expone una interfaz directa a la aplicación cliente. 
+        Su única interfaz es a través de la Capa de Acceso a Datos (DAL) del backend (Node.js/Express). 
+        El DAL interactúa con la base de datos utilizando el driver <code>mssql</code> para Node.js, 
+        ejecutando consultas SQL parametrizadas para realizar operaciones CRUD (Crear, Leer, Actualizar, Borrar) 
+        y asegurar la integridad de los datos mediante el uso de llaves primarias, foráneas y transacciones donde sea necesario.
+    </p>
+
+    <!-- 3. Patrones de Diseño -->
+    <h2 class="section-title">3. Patrones de Diseño</h2>
+
+    <h3>3.1 Patrones Generales / Arquitectónicos</h3>
+
+    <ul>
+        <li><strong>Arquitectura Cliente-Servidor:</strong> Es el patrón fundamental. La aplicación Flutter (cliente) se comunica con la API Node.js (servidor) para obtener y modificar datos.</li>
+        <li><strong>API RESTful:</strong> El backend expone sus funcionalidades siguiendo los principios REST (Representational State Transfer) 
+            a través de endpoints HTTP (GET, POST, PUT), utilizando JSON como formato de datos.</li>
+        <li><strong>Arquitectura por Capas (Layered Architecture):</strong> Tanto el frontend como el backend están organizados en capas lógicas con responsabilidades distintas:
+            <ul>
+                <li><strong>Flutter:</strong> Presentación (UI) → Lógica/Estado (Widgets, Provider) → Servicios → Modelos.</li>
+                <li><strong>Node.js:</strong> Ruteo → Controladores/Manejadores → Acceso a Datos (DAL).</li>
+            </ul>
+        </li>
+    </ul>
+
+    <h3>3.2 Patrones Específicos del Frontend (Flutter)</h3>
+
+    <ul>
+        <li><strong>Provider Pattern (para State Management):</strong> 
+            Utilizamos el paquete <code>provider</code> para gestionar el estado global de la aplicación 
+            (como la información del usuario logueado con <code>UserProvider</code> y el tema con <code>ThemeProvider</code>) 
+            y hacerlo accesible a diferentes partes del árbol de widgets.
+        </li>
+        <li><strong>Service Layer / Repository Pattern (Simplificado):</strong> 
+            Las clases <code>Service.dart</code> (ej. <code>AuthService</code>, <code>LimpiezaService</code>) 
+            encapsulan la lógica de comunicación con la API. 
+            Actúan como una capa de abstracción entre la UI y las llamadas HTTP, 
+            similar a un Repositorio o un Servicio específico para cada entidad o grupo de endpoints.
+        </li>
+        <li><strong>Model Class / Data Transfer Object (DTO):</strong> 
+            Las clases <code>model.dart</code> (ej. <code>Reporte</code>, <code>Amonestacion</code>) 
+            definen la estructura de los datos que se transfieren entre la API y la aplicación, 
+            facilitando el manejo de la información.
+        </li>
+    </ul>
+
+    <h3>3.3 Patrones Específicos del Backend (Node.js/Express)</h3>
+
+    <ul>
+        <li><strong>Middleware Pattern:</strong> 
+            Express utiliza extensamente middlewares (<code>cors()</code>, <code>express.json()</code>, etc.) 
+            para procesar las peticiones HTTP en una cadena de funciones antes de llegar al manejador final de la ruta.
+        </li>
+        <li><strong>Routing Pattern:</strong> 
+            El sistema <code>express.Router()</code> implementa este patrón para mapear las URLs y métodos HTTP 
+            a las funciones controladoras correspondientes (<code>async (req, res) =&gt; {...}</code>).
+        </li>
+        <li><strong>Controller Pattern:</strong> 
+            Las funciones <code>async (req, res) =&gt; {...}</code> asociadas a cada ruta actúan como controladores, 
+            recibiendo la petición, interactuando con las capas inferiores (lógica, datos) y formulando la respuesta.
+        </li>
+        <li><strong>Transaction Pattern:</strong> 
+            Lo usamos explícitamente en la ruta <code>POST /api/limpieza/registrar</code> 
+            para asegurar que la inserción en <code>Limpieza</code> y <code>LimpiezaDetalle</code> 
+            sea atómica (o todo tiene éxito, o todo se revierte).
+        </li>
+    </ul>
+
+    <!-- 4. Diagrama de Secuencia -->
+    <h2 class="section-title">4. Diagrama de Secuencia</h2>
+
+    <h3>4.1 Lista de Secuencias de Eventos Principales</h3>
+
+    <p>
+        Esta lista describe las interacciones paso a paso para las funcionalidades clave 
+        de la aplicación de gestión de dormitorios.
+    </p>
+
+    <p><strong>Actores:</strong></p>
+    <ul>
+        <li><strong>Usuario:</strong> Cualquier persona antes de iniciar sesión.</li>
+        <li><strong>Estudiante:</strong> Usuario con Rol 3.</li>
+        <li><strong>Monitor:</strong> Usuario con Rol 2 (también es Estudiante).</li>
+        <li><strong>Preceptor:</strong> Usuario con Rol 1.</li>
+        <li><strong>App Móvil:</strong> La aplicación Flutter.</li>
+        <li><strong>API Backend:</strong> La API Node.js/Express.</li>
+        <li><strong>Base de Datos (BD):</strong> SQL Server.</li>
+    </ul>
+
+    <!-- 4.2 Autenticación -->
+    <h3>4.2 Autenticación (Todos los Roles)</h3>
+
+    <h4>4.2.1 Secuencia: Inicio de Sesión Exitoso</h4>
+
+    <ol>
+        <li><strong>Usuario → App Móvil:</strong> Ingresa UsuarioID (Matrícula/Clave) y Contraseña, presiona "Acceder".</li>
+        <li><strong>App Móvil → API Backend:</strong> <code>POST /api/auth/login</code> con credenciales.</li>
+        <li><strong>API Backend → Base de Datos:</strong> <code>SELECT</code> en Usuarios buscando coincidencia y <code>LEFT JOIN</code> con Estudiantes/Preceptores para obtener datos.</li>
+        <li><strong>Base de Datos → API Backend:</strong> Devuelve datos del usuario (incluyendo <code>IdRol</code>, <code>NombreCompleto</code>, etc.).</li>
+        <li><strong>API Backend → App Móvil:</strong> Respuesta <code>200 OK</code> con <code>{ success: true, data: {...} }</code>.</li>
+        <li><strong>App Móvil → App Móvil:</strong> Guarda datos del usuario en <code>UserProvider</code>.</li>
+        <li><strong>App Móvil → App Móvil:</strong> Lee <code>IdRol</code> del <code>UserProvider</code>.</li>
+        <li><strong>App Móvil → Usuario:</strong> Navega al Dashboard correspondiente (Estudiante, Monitor o Preceptor).</li>
+    </ol>
+
+    <!-- Imagen 1.jpeg -->
+    <figure>
+        <img src="1.jpeg" alt="Secuencia de Inicio de Sesión Exitoso">
+        <figcaption>Figura 2. Secuencia de Inicio de Sesión Exitoso.</figcaption>
+    </figure>
+
+    <h4>4.2.2 Secuencia: Inicio de Sesión Fallido (Credenciales Inválidas)</h4>
+
+    <ol>
+        <li><strong>Usuario → App Móvil:</strong> Ingresa UsuarioID y Contraseña, presiona "Acceder".</li>
+        <li><strong>App Móvil → API Backend:</strong> <code>POST /api/auth/login</code> con credenciales.</li>
+        <li><strong>API Backend → Base de Datos:</strong> <code>SELECT</code> en Usuarios.</li>
+        <li><strong>Base de Datos → API Backend:</strong> No devuelve resultados.</li>
+        <li><strong>API Backend → App Móvil:</strong> Respuesta <code>401 Unauthorized</code> con <code>{ success: false, message: '...' }</code>.</li>
+        <li><strong>App Móvil → Usuario:</strong> Muestra mensaje de error "Credenciales inválidas".</li>
+    </ol>
+
+    <!-- Imagen 2.jpeg -->
+    <figure>
+        <img src="2.jpeg" alt="Secuencia de Inicio de Sesión Fallido">
+        <figcaption>Figura 3. Secuencia de Inicio de Sesión Fallido.</figcaption>
+    </figure>
+
+    <!-- 4.3 Funcionalidades del Estudiante -->
+    <h3>4.3 Funcionalidades del Estudiante</h3>
+
+    <h4>4.3.1 Secuencia: Ver Propia Calificación de Limpieza</h4>
+
+    <ol>
+        <li><strong>Estudiante → App Móvil:</strong> Navega a la pantalla "Limpieza".</li>
+        <li><strong>App Móvil → App Móvil:</strong> Lee <code>idCuarto</code> del <code>UserProvider</code>.</li>
+        <li><strong>App Móvil → API Backend:</strong> <code>GET /api/limpieza/detalle/{idCuarto}</code>.</li>
+        <li><strong>API Backend → Base de Datos:</strong> <code>SELECT TOP 1</code> en Limpieza con <code>JOIN</code> a LimpiezaDetalle y CriteriosLimpieza para el <code>idCuarto</code> dado.</li>
+        <li><strong>Base de Datos → API Backend:</strong> Devuelve los detalles de la última limpieza (o <code>null</code>).</li>
+        <li><strong>API Backend → App Móvil:</strong> Respuesta <code>200 OK</code> con <code>{ success: true, data: {...} }</code> (o <code>data: null</code>).</li>
+        <li><strong>App Móvil → Estudiante:</strong> Muestra la calificación detallada (o mensaje "No hay registros").</li>
+    </ol>
+
+    <!-- Imagen 3.jpeg -->
+    <figure>
+        <img src="3.jpeg" alt="Secuencia: Estudiante Ve Propia Calificación de Limpieza">
+        <figcaption>Figura 4. Secuencia: Estudiante Ve Propia Calificación de Limpieza.</figcaption>
+    </figure>
+
+    <h4>4.3.2 Secuencia: Ver Propios Reportes</h4>
+
+    <ol>
+        <li><strong>Estudiante → App Móvil:</strong> Navega a la pantalla "Mis Reportes".</li>
+        <li><strong>App Móvil → App Móvil:</strong> Lee matrícula del <code>UserProvider</code>.</li>
+        <li><strong>App Móvil → API Backend:</strong> <code>GET /api/reportes/estudiante/{matricula}</code>.</li>
+        <li><strong>API Backend → Base de Datos:</strong> <code>SELECT</code> en Reportes con <code>JOIN</code> a Estudiantes/Preceptores (para nombre reportante) donde <code>MatriculaReportado</code> coincida.</li>
+        <li><strong>Base de Datos → API Backend:</strong> Devuelve la lista de reportes.</li>
+        <li><strong>API Backend → App Móvil:</strong> Respuesta <code>200 OK</code> con <code>{ success: true, data: [...] }</code>.</li>
+        <li><strong>App Móvil → Estudiante:</strong> Muestra la lista de sus reportes.</li>
+    </ol>
+
+    <!-- Imagen 4.jpeg -->
+    <figure>
+        <img src="4.jpeg" alt="Secuencia: Estudiante Ve Propios Reportes">
+        <figcaption>Figura 5. Secuencia: Estudiante Ve Propios Reportes.</figcaption>
+    </figure>
+
+    <h4>4.3.3 Secuencia: Escanear QR para Registrar Asistencia</h4>
+
+    <ol>
+        <li><strong>Estudiante → App Móvil:</strong> Navega a "Asistencia", presiona "Escanear QR".</li>
+        <li><strong>App Móvil → App Móvil:</strong> Activa la cámara.</li>
+        <li>(Monitor muestra QR generado previamente con <code>{ "idTipoCulto": X, "registradoPor": "MatriculaMonitor" }</code>).</li>
+        <li><strong>Estudiante → App Móvil:</strong> Escanea el QR.</li>
+        <li><strong>App Móvil → App Móvil:</strong> Lee y decodifica el JSON del QR. Lee <code>matriculaEstudiante</code> del <code>UserProvider</code>.</li>
+        <li><strong>App Móvil → API Backend:</strong> <code>POST /api/asistencia/registrar</code> con <code>{ matriculaEstudiante, idTipoCulto, registradoPor }</code>.</li>
+        <li><strong>API Backend → Base de Datos:</strong> <code>INSERT</code> en AsistenciasCultos.</li>
+        <li><strong>Base de Datos → API Backend:</strong> Confirma inserción.</li>
+        <li><strong>API Backend → App Móvil:</strong> Respuesta <code>201 Created</code> con <code>{ success: true, message: '...' }</code>.</li>
+        <li><strong>App Móvil → Estudiante:</strong> Muestra mensaje de éxito "Asistencia registrada".</li>
+    </ol>
+
+    <!-- Imagen 5.jpeg -->
+    <figure>
+        <img src="5.jpeg" alt="Secuencia: Estudiante Registra Asistencia por QR">
+        <figcaption>Figura 6. Secuencia: Estudiante Registra Asistencia por QR.</figcaption>
+    </figure>
+
+    <p class="small-note">(Secuencias similares para ver Amonestaciones y Estadísticas personales)</p>
+
+    <!-- 4.4 Funcionalidades del Monitor -->
+    <h3>4.4 Funcionalidades del Monitor</h3>
+
+    <h4>4.4.1 Secuencia: Generar QR de Asistencia</h4>
+
+    <ol>
+        <li><strong>Monitor → App Móvil:</strong> Navega a "Generar QR".</li>
+        <li><strong>App Móvil → API Backend:</strong> <code>GET /api/cultos/tipos</code> (para llenar el <em>dropdown</em>).</li>
+        <li><strong>API Backend → Base de Datos:</strong> <code>SELECT * FROM Cat_TipoCulto</code>.</li>
+        <li><strong>Base de Datos → API Backend:</strong> Devuelve lista de tipos de culto.</li>
+        <li><strong>API Backend → App Móvil:</strong> Respuesta <code>200 OK</code> con <code>{ success: true, data: [...] }</code>.</li>
+        <li><strong>App Móvil → Monitor:</strong> Muestra <em>dropdown</em> con tipos de culto.</li>
+        <li><strong>Monitor → App Móvil:</strong> Selecciona un tipo de culto (ej. "Matutino", <code>idTipoCulto: 1</code>), presiona "Generar QR".</li>
+        <li><strong>App Móvil → App Móvil:</strong> Lee matrícula del monitor desde <code>UserProvider</code>.</li>
+        <li><strong>App Móvil → App Móvil:</strong> Crea el JSON: <code>{ "idTipoCulto": 1, "registradoPor": "matriculaMonitor" }</code>.</li>
+        <li><strong>App Móvil → Monitor:</strong> Genera y muestra la imagen del QR correspondiente a ese JSON.</li>
+    </ol>
+
+    <!-- Imagen 6.jpeg -->
+    <figure>
+        <img src="6.jpeg" alt="Secuencia: Monitor Genera QR de Asistencia">
+        <figcaption>Figura 7. Secuencia: Monitor Genera QR de Asistencia.</figcaption>
+    </figure>
+
+    <h4>4.4.2 Secuencia: Ver Lista de Asistencias de un Culto/Fecha</h4>
+
+    <ol>
+        <li><strong>Monitor → App Móvil:</strong> Navega a "Ver Asistencias".</li>
+        <li><strong>App Móvil → API Backend:</strong> <code>GET /api/cultos/tipos</code> (para <em>dropdown</em> de culto).</li>
+        <li>(Pasos 3–5 como en Generar QR).</li>
+        <li><strong>App Móvil → Monitor:</strong> Muestra <em>dropdown</em> de culto y selector de fecha.</li>
+        <li><strong>Monitor → App Móvil:</strong> Selecciona culto (ej. <code>idTipoCulto: 1</code>) y fecha (ej. <code>2025-10-20</code>).</li>
+        <li><strong>App Móvil → API Backend:</strong> <code>GET /api/asistencia/culto?idTipoCulto=1&amp;fecha=2025-10-20</code>.</li>
+        <li><strong>API Backend → Base de Datos:</strong> <code>SELECT</code> en AsistenciasCultos con <code>JOIN</code> a Estudiantes filtrando por <code>IdTipoCulto</code> y Fecha.</li>
+        <li><strong>Base de Datos → API Backend:</strong> Devuelve lista de asistentes (Matrícula, NombreCompleto).</li>
+        <li><strong>API Backend → App Móvil:</strong> Respuesta <code>200 OK</code> con <code>{ success: true, data: [...] }</code>.</li>
+        <li><strong>App Móvil → Monitor:</strong> Muestra la lista de estudiantes asistentes.</li>
+    </ol>
+
+    <!-- Imagen 7.jpeg -->
+    <figure>
+        <img src="7.jpeg" alt="Secuencia: Monitor Ve Lista de Asistencias">
+        <figcaption>Figura 8. Secuencia: Monitor Ve Lista de Asistencias.</figcaption>
+    </figure>
+
+    <h4>4.4.3 Secuencia: Ver Lista de Cuartos para Evaluar Limpieza</h4>
+
+    <ol>
+        <li><strong>Monitor → App Móvil:</strong> Navega a "Limpieza".</li>
+        <li><strong>App Móvil → API Backend:</strong> <code>GET /api/limpieza/cuartos-con-calificacion</code>.</li>
+        <li><strong>API Backend → Base de Datos:</strong> <code>SELECT</code> en Cuartos con <code>LEFT JOIN</code> a la última Limpieza de cada cuarto.</li>
+        <li><strong>Base de Datos → API Backend:</strong> Devuelve lista de cuartos (<code>IdCuarto</code>, <code>NumeroCuarto</code>, <code>IdPasillo</code>, <code>UltimaCalificacion</code>).</li>
+        <li><strong>API Backend → App Móvil:</strong> Respuesta <code>200 OK</code> con <code>{ success: true, data: [...] }</code>.</li>
+        <li><strong>App Móvil → App Móvil:</strong> Agrupa los cuartos por <code>IdPasillo</code>.</li>
+        <li><strong>App Móvil → Monitor:</strong> Muestra la lista de cuartos agrupada por pasillo.</li>
+    </ol>
+
+    <!-- Imagen 8.jpeg -->
+    <figure>
+        <img src="8.jpeg" alt="Secuencia: Monitor Ve Lista de Cuartos para Evaluar">
+        <figcaption>Figura 9. Secuencia: Monitor Ve Lista de Cuartos para Evaluar.</figcaption>
+    </figure>
+
+    <h4>4.4.4 Secuencia: Registrar Evaluación de Limpieza</h4>
+
+    <ol>
+        <li><strong>Monitor → App Móvil:</strong> En "Limpieza", presiona el ícono de escoba en un cuarto (ej. <code>IdCuarto: 1</code>).</li>
+        <li><strong>App Móvil → App Móvil:</strong> Navega a <code>RegistrarLimpiezaScreen</code>, pasando <code>idCuarto: 1</code>.</li>
+        <li><strong>App Móvil (RegistrarLimpiezaScreen) → API Backend:</strong> <code>GET /api/limpieza/criterios</code>.</li>
+        <li><strong>API Backend → Base de Datos:</strong> <code>SELECT * FROM CriteriosLimpieza</code>.</li>
+        <li><strong>Base de Datos → API Backend:</strong> Devuelve lista de criterios.</li>
+        <li><strong>API Backend → App Móvil:</strong> Respuesta <code>200 OK</code> con <code>{ success: true, data: [...] }</code>.</li>
+        <li><strong>App Móvil → Monitor:</strong> Muestra la lista de criterios con selectores de calificación (1–10) y campos adicionales.</li>
+        <li><strong>Monitor → App Móvil:</strong> Ingresa todas las calificaciones y observaciones, presiona "Guardar".</li>
+        <li><strong>App Móvil → App Móvil:</strong> Lee matrícula del monitor desde <code>UserProvider</code>.</li>
+        <li><strong>App Móvil → API Backend:</strong> <code>POST /api/limpieza/registrar</code> con <code>{ idCuarto: 1, evaluadoPor: matriculaMonitor, detallesMatutinos: [...], ... }</code>.</li>
+        <li><strong>API Backend → Base de Datos:</strong> Inicia transacción. <code>INSERT</code> en Limpieza. <code>INSERT</code> en LimpiezaDetalle. <code>COMMIT</code> transacción.</li>
+        <li><strong>Base de Datos → API Backend:</strong> Confirma inserción.</li>
+        <li><strong>API Backend → App Móvil:</strong> Respuesta <code>201 Created</code> con <code>{ success: true, message: '...', idLimpieza: ... }</code>.</li>
+        <li><strong>App Móvil → Monitor:</strong> Muestra mensaje de éxito.</li>
+        <li><strong>App Móvil → App Móvil:</strong> Regresa a la pantalla anterior (<code>limpieza_monitor_screen.dart</code>), devolviendo <code>true</code>.</li>
+        <li><strong>App Móvil (limpieza_monitor_screen.dart) → App Móvil:</strong> Recarga la lista de cuartos.</li>
+    </ol>
+
+    <!-- Imagen 9.jpeg -->
+    <figure>
+        <img src="9.jpeg" alt="Secuencia: Monitor Registra Evaluación de Limpieza">
+        <figcaption>Figura 10. Secuencia: Monitor Registra Evaluación de Limpieza.</figcaption>
+    </figure>
+
+    <h4>4.4.5 Secuencia: Buscar Reportes de un Estudiante</h4>
+
+    <ol>
+        <li><strong>Monitor → App Móvil:</strong> Navega a "Reportes", ingresa matrícula, presiona "Buscar".</li>
+        <li><strong>App Móvil → API Backend:</strong> <code>GET /api/reportes/estudiante/{matricula}</code>.</li>
+        <li>(Pasos 4–7 como en "Estudiante: Ver Propios Reportes", pero la App usa <code>ReporteMonitor</code>).</li>
+        <li><strong>App Móvil → Monitor:</strong> Muestra la lista de reportes para esa matrícula.</li>
+    </ol>
+
+    <!-- Imagen 9.jpeg (reutilizada) -->
+    <figure>
+        <img src="9.jpeg" alt="Secuencia: Monitor Busca Reportes de Estudiante">
+        <figcaption>Figura 11. Secuencia: Monitor Busca Reportes de Estudiante.</figcaption>
+    </figure>
+
+    <h4>4.4.6 Secuencia: Crear Reporte para un Estudiante (desde Buscador)</h4>
+
+    <ol>
+        <li><strong>Monitor → App Móvil:</strong> En "Reportes", después de buscar una matrícula, presiona "+ Nuevo Reporte".</li>
+        <li><strong>App Móvil → App Móvil:</strong> Navega a <code>CrearReporteScreen</code>, pasando la <code>matriculaEstudiante</code> buscada.</li>
+        <li><strong>Monitor → App Móvil:</strong> Escribe el motivo, presiona "Guardar".</li>
+        <li><strong>App Móvil → App Móvil:</strong> Lee matrícula del monitor (<code>reportadoPor</code>) del <code>UserProvider</code>.</li>
+        <li><strong>App Móvil → API Backend:</strong> <code>POST /api/reportes/crear</code> con <code>{ matriculaReportado, reportadoPor, tipoUsuarioReportante: 'Monitor', motivo }</code>.</li>
+        <li>(Pasos 11–15 como en "Registrar Evaluación de Limpieza", pero para reportes).</li>
+    </ol>
+
+    <!-- Imagen 10.jpeg -->
+    <figure>
+        <img src="10.jpeg" alt="Secuencia: Monitor Crea Reporte">
+        <figcaption>Figura 12. Secuencia: Monitor Crea Reporte.</figcaption>
+    </figure>
+
+    <!-- 4.5 Funcionalidades del Preceptor -->
+    <h3>4.5 Funcionalidades del Preceptor</h3>
+
+    <h4>4.5.1 Secuencia: Ver Lista de Monitores</h4>
+
+    <ol>
+        <li><strong>Preceptor → App Móvil:</strong> Navega a "Monitores".</li>
+        <li><strong>App Móvil → API Backend:</strong> <code>GET /api/usuarios/monitores</code>.</li>
+        <li><strong>API Backend → Base de Datos:</strong> <code>SELECT U.UsuarioID, E.NombreCompleto FROM Usuarios U JOIN Estudiantes E ON U.UsuarioID = E.Matricula WHERE U.IdRol = 2</code>.</li>
+        <li><strong>Base de Datos → API Backend:</strong> Devuelve lista de monitores.</li>
+        <li><strong>API Backend → App Móvil:</strong> Respuesta <code>200 OK</code> con <code>{ success: true, data: [...] }</code>.</li>
+        <li><strong>App Móvil → Preceptor:</strong> Muestra la lista de monitores actuales.</li>
+    </ol>
+
+    <!-- Imagen 11.jpeg -->
+    <figure>
+        <img src="11.jpeg" alt="Secuencia: Preceptor Ve Lista de Monitores">
+        <figcaption>Figura 13. Secuencia: Preceptor Ve Lista de Monitores.</figcaption>
+    </figure>
+
+    <h4>4.5.2 Secuencia: Asignar Rol de Monitor a Estudiante</h4>
+
+    <ol>
+        <li><strong>Preceptor → App Móvil:</strong> En "Monitores", ingresa matrícula de estudiante, presiona "Asignar Rol".</li>
+        <li><strong>App Móvil → API Backend:</strong> <code>PUT /api/usuarios/{matricula}/rol</code> con <code>{ nuevoRol: 2 }</code>.</li>
+        <li><strong>API Backend → Base de Datos:</strong> <code>UPDATE Usuarios SET IdRol = 2 WHERE UsuarioID = {matricula}</code>.</li>
+        <li><strong>Base de Datos → API Backend:</strong> Confirma actualización.</li>
+        <li><strong>API Backend → App Móvil:</strong> Respuesta <code>200 OK</code> con <code>{ success: true, message: '...' }</code>.</li>
+        <li><strong>App Móvil → Preceptor:</strong> Muestra mensaje de éxito.</li>
+        <li><strong>App Móvil → App Móvil:</strong> Recarga la lista de monitores.</li>
+    </ol>
+
+    <!-- Imagen 12.jpeg -->
+    <figure>
+        <img src="12.jpeg" alt="Secuencia: Preceptor Asigna Rol de Monitor">
+        <figcaption>Figura 14. Secuencia: Preceptor Asigna Rol de Monitor.</figcaption>
+    </figure>
+
+    <h4>4.5.3 Secuencia: Quitar Rol de Monitor</h4>
+
+    <ol>
+        <li><strong>Preceptor → App Móvil:</strong> En "Monitores", presiona el ícono de eliminar en un monitor.</li>
+        <li><strong>App Móvil → Preceptor:</strong> Muestra diálogo de confirmación.</li>
+        <li><strong>Preceptor → App Móvil:</strong> Confirma.</li>
+        <li><strong>App Móvil → API Backend:</strong> <code>PUT /api/usuarios/{matricula}/rol</code> con <code>{ nuevoRol: 3 }</code>.</li>
+        <li><strong>API Backend → Base de Datos:</strong> 
+            <code>UPDATE Usuarios SET IdRol = 3 WHERE UsuarioID = {matricula}</code>. 
+            <code>UPDATE Estudiantes SET IdPasillo = NULL, IdDormitorio = NULL WHERE Matricula = {matricula}</code>.
+        </li>
+        <li>(Pasos 4–7 como en Asignar Rol).</li>
+    </ol>
+
+    <!-- Imagen 13.jpeg -->
+    <figure>
+        <img src="13.jpeg" alt="Secuencia: Preceptor Quita Rol de Monitor">
+        <figcaption>Figura 15. Secuencia: Preceptor Quita Rol de Monitor.</figcaption>
+    </figure>
+
+    <h4>4.5.4 Secuencia: Ver Todos los Reportes (con paginación/búsqueda)</h4>
+
+    <ol>
+        <li><strong>Preceptor → App Móvil:</strong> Navega a "Reportes".</li>
+        <li><strong>App Móvil → API Backend:</strong> <code>GET /api/reportes?page=1&amp;limit=20</code>.</li>
+        <li><strong>API Backend → Base de Datos:</strong> 
+            <code>SELECT ... FROM Reportes R JOIN Estudiantes E ... ORDER BY ... OFFSET 0 ROWS FETCH NEXT 20 ROWS ONLY</code>. 
+            <code>SELECT COUNT(*)...</code>.
+        </li>
+        <li><strong>Base de Datos → API Backend:</strong> Devuelve los primeros 20 reportes y el conteo total.</li>
+        <li><strong>API Backend → App Móvil:</strong> Respuesta <code>200 OK</code> con <code>{ success: true, data: [...], total: N, page: 1, limit: 20 }</code>.</li>
+        <li><strong>App Móvil → Preceptor:</strong> Muestra los primeros 20 reportes.</li>
+        <li>(Opcional: Si el preceptor escribe en buscar) <strong>Preceptor → App Móvil:</strong> Ingresa texto en buscador.</li>
+        <li><strong>App Móvil → API Backend:</strong> <code>GET /api/reportes?page=1&amp;limit=20&amp;search={texto}</code>.</li>
+        <li>(Pasos 3–6 se repiten con el filtro <code>WHERE</code>).</li>
+        <li>(Opcional: Si el preceptor llega al final de la lista) <strong>App Móvil → API Backend:</strong> 
+            <code>GET /api/reportes?page=2&amp;limit=20&amp;search={texto}</code>.
+        </li>
+        <li>(Pasos 3–6 se repiten para la página 2, y la App añade los resultados a la lista existente).</li>
+    </ol>
+
+    <!-- Imagen 14.jpeg -->
+    <figure>
+        <img src="14.jpeg" alt="Secuencia: Preceptor Ve Todos los Reportes (Paginado)">
+        <figcaption>Figura 16. Secuencia: Preceptor Ve Todos los Reportes (Paginado).</figcaption>
+    </figure>
+
+    <h4>4.5.5 Secuencia: Crear Reporte (Preceptor)</h4>
+
+    <ol>
+        <li><strong>Preceptor → App Móvil:</strong> En "Reportes", presiona "+ Nuevo Reporte".</li>
+        <li><strong>App Móvil → App Móvil:</strong> Navega a <code>CrearReportePreceptorScreen</code>.</li>
+        <li><strong>Preceptor → App Móvil:</strong> Ingresa matrícula del estudiante, escribe motivo, presiona "Guardar".</li>
+        <li><strong>App Móvil → App Móvil:</strong> Lee <code>claveEmpleado</code> del preceptor (<code>reportadoPor</code>) del <code>UserProvider</code>.</li>
+        <li><strong>App Móvil → API Backend:</strong> <code>POST /api/reportes/crear</code> con <code>{ matriculaReportado, reportadoPor, tipoUsuarioReportante: 'Preceptor', motivo }</code>.</li>
+        <li>(Pasos 11–15 como en "Monitor: Crear Reporte").</li>
+    </ol>
+
+    <!-- Imagen 15.jpeg -->
+    <figure>
+        <img src="15.jpeg" alt="Secuencia: Preceptor Crea Reporte">
+        <figcaption>Figura 17. Secuencia: Preceptor Crea Reporte.</figcaption>
+    </figure>
+
+    <h4>4.5.6 Secuencia: Ver Todas las Amonestaciones</h4>
+
+    <ol>
+        <li><strong>Preceptor → App Móvil:</strong> Navega a "Amonestaciones".</li>
+        <li><strong>App Móvil → API Backend:</strong> <code>GET /api/amonestaciones</code>.</li>
+        <li><strong>API Backend → Base de Datos:</strong> 
+            <code>SELECT A.*, E.NombreCompleto, P.NombreCompleto, N.Nombre FROM Amonestaciones A JOIN Estudiantes E JOIN Preceptores P JOIN Cat_NivelAmonestacion N ...</code>.
+        </li>
+        <li><strong>Base de Datos → API Backend:</strong> Devuelve lista completa de amonestaciones.</li>
+        <li><strong>API Backend → App Móvil:</strong> Respuesta <code>200 OK</code> con <code>{ success: true, data: [...] }</code>.</li>
+        <li><strong>App Móvil → Preceptor:</strong> Muestra la lista de amonestaciones.</li>
+    </ol>
+
+    <!-- Imagen 16.jpeg -->
+    <figure>
+        <img src="16.jpeg" alt="Secuencia: Preceptor Ve Todas las Amonestaciones">
+        <figcaption>Figura 18. Secuencia: Preceptor Ve Todas las Amonestaciones.</figcaption>
+    </figure>
+
+    <h4>4.5.7 Secuencia: Crear Amonestación</h4>
+
+    <ol>
+        <li><strong>Preceptor → App Móvil:</strong> En "Amonestaciones", presiona "+ Nueva Amonestación".</li>
+        <li><strong>App Móvil → App Móvil:</strong> Navega a <code>CrearAmonestacionScreen</code>.</li>
+        <li><strong>App Móvil → API Backend:</strong> <code>GET /api/amonestaciones/niveles</code> (para <em>dropdown</em> de nivel).</li>
+        <li>(API obtiene niveles de BD y los devuelve a la App).</li>
+        <li><strong>App Móvil → Preceptor:</strong> Muestra formulario (Matrícula, Nivel, Motivo).</li>
+        <li><strong>Preceptor → App Móvil:</strong> Ingresa datos, presiona "Guardar".</li>
+        <li><strong>App Móvil → App Móvil:</strong> Lee <code>claveEmpleado</code> del preceptor del <code>UserProvider</code>.</li>
+        <li><strong>App Móvil → API Backend:</strong> <code>POST /api/amonestaciones/registrar</code> con <code>{ matriculaEstudiante, clavePreceptor, idNivel, motivo }</code>.</li>
+        <li>(API guarda en BD y devuelve éxito a la App).</li>
+        <li><strong>App Móvil → Preceptor:</strong> Muestra mensaje de éxito.</li>
+        <li><strong>App Móvil → App Móvil:</strong> Regresa a la lista, opcionalmente recarga.</li>
+    </ol>
+
+    <!-- Imagen 17.jpeg -->
+    <figure>
+        <img src="17.jpeg" alt="Secuencia: Preceptor Crea Amonestación">
+        <figcaption>Figura 19. Secuencia: Preceptor Crea Amonestación.</figcaption>
+    </figure>
+
+    <h4>4.5.8 Secuencia: Ver Estado de Limpieza General</h4>
+
+    <ol>
+        <li><strong>Preceptor → App Móvil:</strong> Navega a "Limpieza".</li>
+        <li><strong>App Móvil → API Backend:</strong> <code>GET /api/limpieza/cuartos-con-calificacion</code>.</li>
+        <li>(Pasos 3–7 como en "Monitor: Ver Lista de Cuartos").</li>
+        <li><strong>App Móvil → Preceptor:</strong> Muestra la lista de todos los cuartos agrupados por pasillo, con su última calificación.</li>
+    </ol>
+
+    <!-- Imagen 19.jpeg -->
+    <figure>
+        <img src="19.jpeg" alt="Secuencia: Preceptor Ve Estado de Limpieza General">
+        <figcaption>Figura 20. Secuencia: Preceptor Ve Estado de Limpieza General.</figcaption>
+    </figure>
+
+    <hr>
+    <p class="small-note">
+        Fin del documento de Diseño de Arquitectura de Software - App Gestión Dormitorios HVU-ULV.
+    </p>
 
 </body>
 </html>
