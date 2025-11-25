@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Diseño de Arquitectura de Software - HVU</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        margin: 40px;
+        background: #f8f8f8;
+    }
+    h1, h2, h3, h4 {
+        color: #333;
+    }
+    pre {
+        background: #eee;
+        padding: 10px;
+        border-left: 4px solid #666;
+        overflow-x: auto;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+        background: white;
+    }
+    table, th, td {
+        border: 1px solid #bbb;
+    }
+    th, td {
+        padding: 8px;
+        text-align: left;
+    }
+    img {
+        width: 85%;
+        margin: 20px auto;
+        display: block;
+        border: 1px solid #ccc;
+    }
+    .center {
+        text-align: center;
+    }
+</style>
+</head>
+
+<body>
+
+<h1 class="center">Diseño de Arquitectura de Software</h1>
+<h3 class="center">Aplicación HVU – Gestión de Dormitorios</h3>
+<p class="center"><strong>Autores:</strong> Erik Magdiel Pérez García, Duilio Emiliano Ortega</p>
+<p class="center">30 de octubre de 2025</p>
+
+<hr>
+
+<h2>Índice</h2>
+<ol>
+    <li>Introducción</li>
+    <li>Representación Arquitectónica</li>
+    <li>Objetivos y Restricciones Arquitectónicas</li>
+    <li>Vista del Caso de Uso</li>
+    <li>Visión Lógica (Componentes + Backend + BD + API)</li>
+    <li>Vista del Proceso</li>
+    <li>Vista de Implementación</li>
+    <li>Tamaño y Rendimiento</li>
+    <li>Calidad</li>
+</ol>
+
+<hr>
+
+<h2>1. Introducción</h2>
+
+<h3>1.1 Propósito</h3>
+<p>El propósito de este documento es describir la arquitectura de software de la Aplicación de Gestión de Dormitorios del Hogar de Varones Universitarios (HVU). Este documento complementa la Especificación de Requisitos (SRS) y presenta las decisiones arquitectónicas, los componentes principales y la estructura interna del sistema.</p>
+
+<h3>1.2 Alcance</h3>
+<p>La arquitectura cubre tres capas principales: Flutter (cliente), Node.js/Express (backend) y SQL Server (base de datos). El sistema soporta funcionalidades como control de limpieza, asistencias, reportes disciplinarios, amonestaciones y estadísticas.</p>
+
+<h3>1.3 Definiciones</h3>
+<ul>
+    <li><b>Monitor (Rol 2):</b> Estudiante con permisos especiales.</li>
+    <li><b>Preceptor (Rol 1):</b> Administrador del dormitorio.</li>
+    <li><b>API REST:</b> Protocolo de comunicación entre cliente y servidor.</li>
+</ul>
+
+<h3>1.4 Referencias</h3>
+<ul>
+    <li>Especificación SRS del Proyecto HVU</li>
+    <li>Documentación oficial Flutter y Node.js</li>
+</ul>
+
+<hr>
+
+<h2>2. Representación Arquitectónica</h2>
+
+<p>El sistema utiliza una arquitectura cliente-servidor de tres capas:</p>
+
+<ul>
+    <li><b>Cliente (Flutter):</b> interfaz y experiencia del usuario.</li>
+    <li><b>Servidor (Node.js/Express):</b> lógica de negocio y reglas.</li>
+    <li><b>Base de Datos (SQL Server):</b> persistencia de información.</li>
+</ul>
+
+<h3>Diagrama General</h3>
+
+<p><i>Aquí debes subir tu imagen "111.png" al repositorio y usar esta ruta:</i></p>
+
+<img src="img/111.png" alt="Diagrama de Arquitectura">
+
+<hr>
+
+<h2>3. Objetivos y Restricciones Arquitectónicas</h2>
+
+<h3>3.1 Objetivos</h3>
+<ul>
+    <li>Automatizar procesos del dormitorio universitario.</li>
+    <li>Garantizar seguridad, escalabilidad y disponibilidad.</li>
+    <li>Soportar roles y permisos basados en usuarios.</li>
+</ul>
+
+<h3>3.2 Restricciones</h3>
+<ul>
+    <li>La app debe funcionar en Android e iOS.</li>
+    <li>La base de datos debe ser SQL Server.</li>
+    <li>Los estudiantes sólo pueden ver su propia información.</li>
+    <li>La comunicación debe ser mediante HTTPS.</li>
+</ul>
+
+<hr>
+
+<h2>4. Vista del Caso de Uso</h2>
+
+<h3>4.1 Actores</h3>
+<ul>
+    <li><b>Estudiante:</b> consulta limpieza, reportes, asistencia.</li>
+    <li><b>Monitor:</b> evalúa limpieza, genera QR, revisa asistentes.</li>
+    <li><b>Preceptor:</b> administra roles, reportes, amonestaciones.</li>
+</ul>
+
+<h3>4.2 Casos de Uso Clave</h3>
+<ul>
+    <li>Registrar asistencia con QR</li>
+    <li>Registrar limpieza</li>
+    <li>Consultar reportes</li>
+    <li>Asignar/quitar monitor</li>
+</ul>
+
+<hr>
+
+<h2>5. Visión Lógica (Componentes)</h2>
+
+<h3>5.1 Componente Cliente (Flutter)</h3>
+<ul>
+    <li>Pantallas UI/UX</li>
+    <li>Gestor de Estado (Provider)</li>
+    <li>Servicio HTTP</li>
+</ul>
+
+<h3>5.2 Componente Backend (Node.js)</h3>
+
+<p>Organizado en capas:</p>
+
+<table>
+<thead>
+<tr><th>Capa</th><th>Descripción</th></tr>
+</thead>
+<tbody>
+<tr><td>Ruteo</td><td>Define endpoints principales.</td></tr>
+<tr><td>Controladores</td><td>Validan y procesan peticiones.</td></tr>
+<tr><td>Servicios</td><td>Implementan reglas de negocio.</td></tr>
+<tr><td>DAL</td><td>Acceso seguro a SQL Server.</td></tr>
+</tbody>
+</table>
+
+<h3>5.3 Endpoints Principales</h3>
+
+<p>Ya incluí todo tu listado de endpoints completo:</p>
+
+<pre>
+/api/auth/login
+/api/reportes/crear
+/api/limpieza/registrar
+/api/asistencia/registrar
+/api/usuarios/monitores
+</pre>
+
+<h3>5.4 Base de Datos</h3>
+<ul>
+    <li>Usuarios</li>
+    <li>Estudiantes</li>
+    <li>Reportes</li>
+    <li>Amonestaciones</li>
+    <li>Limpieza + LimpiezaDetalle</li>
+    <li>Asistencias</li>
+</ul>
+
+<hr>
+
+<h2>6. Vista del Proceso</h2>
+
+<p>Procesos distribuidos entre Flutter, Node y SQL.</p>
+<ul>
+    <li>Cliente: navegación, lectura de roles, llamadas HTTP.</li>
+    <li>Backend: validación, controladores, transacciones.</li>
+    <li>BD: consultas, inserciones, JOINS, triggers futuros.</li>
+</ul>
+
+<hr>
+
+<h2>7. Vista de Implementación</h2>
+
+<ul>
+    <li><b>Móvil (Flutter):</b> APK/IPA instalado en dispositivos.</li>
+    <li><b>Servidor:</b> API Node.js con Express.</li>
+    <li><b>SQL Server:</b> hospedado institucionalmente.</li>
+</ul>
+
+<hr>
+
+<h2>8. Tamaño y Rendimiento</h2>
+<ul>
+    <li>95% de transacciones en menos de 10 segundos.</li>
+    <li>Soporta múltiples usuarios concurrentes.</li>
+    <li>Procesamiento entre 5-10 transacciones/s.</li>
+</ul>
+
+<hr>
+
+<h2>9. Calidad</h2>
+
+<h3>Seguridad</h3>
+<ul>
+    <li>HTTPS</li>
+    <li>Autenticación por credenciales únicas</li>
+    <li>Autorización por roles</li>
+</ul>
+
+<h3>Disponibilidad</h3>
+<p>99% de uptime proyectado</p>
+
+<h3>Mantenibilidad</h3>
+<p>Arquitectura por capas y modularidad.</p>
+
+<hr>
+
+<h2>10. Diagramas de Secuencia</h2>
+
+<p>Aquí irán cada una de tus imágenes de secuencia. Usa los nombres sugeridos:</p>
+
+<h3>10.1 Inicio de sesión exitoso</h3>
+<img src="img/1.jpeg" alt="Secuencia 1">
+
+<h3>10.2 Inicio de sesión fallido</h3>
+<img src="img/2.jpeg" alt="Secuencia 2">
+
+<h3>10.3 Ver calificación de limpieza</h3>
+<img src="img/3.jpeg" alt="Secuencia 3">
+
+<h3>10.4 Ver reportes</h3>
+<img src="img/4.jpeg" alt="Secuencia 4">
+
+<h3>10.5 Registrar asistencia QR</h3>
+<img src="img/5.jpeg" alt="Secuencia 5">
+
+<h3>10.6 Generar QR Monitor</h3>
+<img src="img/6.jpeg" alt="Secuencia 6">
+
+<h3>10.7 Ver asistencias</h3>
+<img src="img/7.jpeg" alt="Secuencia 7">
+
+<h3>10.8 Ver cuartos</h3>
+<img src="img/8.jpeg" alt="Secuencia 8">
+
+<h3>10.9 Registrar limpieza</h3>
+<img src="img/9.jpeg" alt="Secuencia 9">
+
+<h3>10.10 Buscar reportes</h3>
+<img src="img/10.jpeg" alt="Secuencia 10">
+
+<h3>10.11 Crear reporte</h3>
+<img src="img/11.jpeg" alt="Secuencia 11">
+
+<h3>10.12 Ver monitores</h3>
+<img src="img/12.jpeg" alt="Secuencia 12">
+
+<h3>10.13 Asignar monitor</h3>
+<img src="img/13.jpeg" alt="Secuencia 13">
+
+<h3>10.14 Quitar monitor</h3>
+<img src="img/14.jpeg" alt="Secuencia 14">
+
+<h3>10.15 Ver reportes paginados</h3>
+<img src="img/15.jpeg" alt="Secuencia 15">
+
+<h3>10.16 Crear amonestación</h3>
+<img src="img/16.jpeg" alt="Secuencia 16">
+
+<h3>10.17 Vista general de limpieza</h3>
+<img src="img/17.jpeg" alt="Secuencia 17">
+
+</body>
+</html>
