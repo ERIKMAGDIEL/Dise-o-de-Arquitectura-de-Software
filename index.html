@@ -109,8 +109,8 @@
         </p>
     </div>
 
-    <section id="introduccion">
-    <h1>1. Introducción</h1>
+    
+    <h1 class="section-title">1. Introducción</h1>
 
     <h2>1.1 Propósito</h2>
     <p>
@@ -181,7 +181,7 @@
     </p>
 
     <!-- 2. Descripción de Componentes y sus Interfaces -->
-    <h2 class="section-title">2. Descripción de Componentes y sus Interfaces</h2>
+    <h1 class="section-title">2. Descripción de Componentes y sus Interfaces</h1>
 
     <h3>2.1 Componente: Aplicación Móvil (Cliente - Flutter)</h3>
 
@@ -446,8 +446,9 @@
     </p>
 
 
-    <section id="objetivos-restricciones">
-    <h1>3. Objetivos y restricciones arquitectónicas</h1>
+ 
+    <h1 class="section-title">3. Objetivos y restricciones arquitectónicas</h1>
+   
 
     <p>La arquitectura del sistema HVU está diseñada bajo los siguientes objetivos y restricciones:</p>
 
@@ -473,9 +474,9 @@
 
     
     <!-- 3. Patrones de Diseño -->
-    <h2 class="section-title">4. Patrones de Diseño</h2>
+    <h1 class="section-title">4. Patrones de Diseño</h1>
 
-    <h3>4.1 Patrones Generales / Arquitectónicos</h3>
+    <h3>4.1 Patrones Generales y Arquitectónicos</h3>
 
     <ul>
         <li><strong>Arquitectura Cliente-Servidor:</strong> Es el patrón fundamental. La aplicación Flutter (cliente) se comunica con la API Node.js (servidor) para obtener y modificar datos.</li>
@@ -535,7 +536,7 @@
 
     
     <!-- 5. Diagrama de Secuencia -->
-    <h2 class="section-title">5. Diagrama de Secuencia</h2>
+    <h1 class="section-title">5. Diagrama de Secuencia</h1>
 
     <h3>5.1 Lista de Secuencias de Eventos Principales</h3>
 
@@ -936,32 +937,31 @@
         <figcaption>Figura 20. Secuencia: Preceptor Ve Estado de Limpieza General.</figcaption>
     </figure>
 
-<section id="vista-implementacion">
-    <h1>7. Vista de implementación</h1>
+  <h1 class="section-title">6. Vista de implementación</h1>
     <p>
         Esta vista describe los nodos físicos y los componentes que se despliegan en cada uno de ellos,
         así como su interacción en el entorno real.
     </p>
 
-    <h2>7.1 Dispositivo móvil (Android)</h2>
+    <h2>6.1 Dispositivo móvil (Android y Ios)</h2>
     <p>
         Los estudiantes, monitores y el preceptor utilizan la aplicación móvil Flutter.  
         El dispositivo móvil ejecuta la capa de presentación y envía solicitudes a la API mediante HTTP.
     </p>
 
-    <h2>7.2 Servidor Backend (Node.js)</h2>
+    <h2>6.2 Servidor Backend (Node.js)</h2>
     <p>
         Se ejecuta la API REST desarrollada en Express.  
         Responsable de recibir solicitudes, procesar la lógica de negocio y comunicarse con la BD.
     </p>
 
-    <h2>7.3 Servidor de Base de Datos (SQL Server)</h2>
+    <h2>6.3 Servidor de Base de Datos (SQL Server)</h2>
     <p>
         Almacena todos los datos del HVU: estudiantes, reportes, amonestaciones, limpiezas y asistencias.
         Opera en un entorno seguro provisto por la institución.
     </p>
 
-    <h2>7.4 Infraestructura de despliegue</h2>
+    <h2>6.4 Infraestructura de despliegue</h2>
     <ul>
         <li><strong>Frontend:</strong> Compilado en Flutter.</li>
         <li><strong>Backend:</strong> Node.js en servidor local o nube institucional.</li>
@@ -970,8 +970,7 @@
 </section>
 
 
-    <section id="tamano-rendimiento">
-    <h1>8. Tamaño y rendimiento</h1>
+    <h1 class="section-title">7. Tamaño y rendimiento</h1>
 
     <p>Los requisitos de tamaño y rendimiento previstos para el sistema HVU son los siguientes:</p>
 
@@ -985,8 +984,8 @@
     </ul>
 </section>
 
-    <section id="calidad">
-    <h1>9. Calidad</h1>
+  
+    <h1 class="section-title">8. Calidad</h1>
 
     <p>
         La arquitectura del sistema HVU sigue principios de calidad basados en 
@@ -998,7 +997,7 @@
         <li><strong>Usabilidad:</strong> La aplicación móvil ofrece una interfaz intuitiva y accesible.</li>
         <li><strong>Seguridad:</strong> Todas las transacciones se validan y la API exige autenticación.</li>
         <li><strong>Rendimiento:</strong> Las operaciones se ejecutan en tiempos óptimos gracias al modelo cliente-servidor.</li>
-        <li><strong>Compatibilidad:</strong> La app es compatible con Android 5.0+.</li>
+        <li><strong>Compatibilidad:</strong> La app es compatible con Android 5.0+ y ios 15+</li>
         <li><strong>Mantenibilidad:</strong> La arquitectura por capas permite actualizar partes sin afectar todo el sistema.</li>
         <li><strong>Fiabilidad:</strong> El backend emplea manejo de errores robusto y transacciones seguras.</li>
     </ul>
@@ -1008,7 +1007,7 @@
     
     <hr>
     <p class="small-note">
-        Fin del documento de Diseño de Arquitectura de Software - App Gestión Dormitorios HVU-ULV.
+     Diseño de Arquitectura de Software - App Gestión Dormitorios HVU-ULV.
     </p>
 
 </body>
